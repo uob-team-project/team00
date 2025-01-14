@@ -62,7 +62,9 @@ jobs:
     name: deploy development app via ssh
     runs-on: ubuntu-latest
     needs: publish-docker
-    if: success() # Only runs if previous jobs are successful
+    #if: startsWith(github.ref, 'refs/tags/') && success()
+    #if: success()
+    if: false    
     concurrency: # Ensures only one deploy job runs at a time
       group: deployment
 
