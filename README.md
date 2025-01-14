@@ -92,10 +92,10 @@ In a terminal, `clone` the repo, `cd` into the cloned folder and do:
 npm run java:docker
 ```
 
-or
+or for macswith M1 (arm64) chips
 
 ```
-npm run java:docker:arm64 #for m1 macs
+npm run java:docker:arm64
 ```
 
 The above will build the production version of the app
