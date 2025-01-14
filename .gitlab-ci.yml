@@ -1,0 +1,81 @@
+image: jhipster/jhipster:v8.7.3
+
+cache:
+  key: '$CI_COMMIT_REF_NAME'
+  paths:
+    - .maven/
+stages:
+  - check
+  - build
+  - test
+  - analyze
+  - package
+  - release
+  - deploy
+before_script:
+  - export NG_CLI_ANALYTICS="false"
+  - export MAVEN_USER_HOME=`pwd`/.maven
+
+publish-docker:
+  stage: release
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: 'tcp://docker:2375'
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ''
+  dependencies:
+    - maven-package
+  script:
+    - echo "pushing ${CI_REGISTRY_IMAGE} ${CI_REGISTRY_USER} ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY} ${CI_COMMIT_TAG}"
+    - ./mvnw -ntp -e -X jib:build -DskipTests -Pprod -Djib.to.auth.username=${CI_REGISTRY_USER} -Djib.to.auth.password=${CI_REGISTRY_PASSWORD} -Djib.to.image=${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}latest -Dmaven.repo.local=$MAVEN_USER_HOME
+
+#deploy expects $RSA $USER@$IP are set in the repo - Setting -> CI/CD -> variables
+#$RSA should be a private key file, $USER is the VM user name (e.g. ubuntu, root or ec2) and $IP is the IP address of the Virtual Machine
+#assumes SSH is running on the VM, also assumes Ubuntu VM (with sudo)
+deploy-dev:
+  image: alpine:latest
+  stage: deploy
+  #when: never means this stage is disabled, change to when: on_success to enable
+  when: never
+  #when: on_success
+  variables:
+    URL: '${CI_PROJECT_NAME}.bham.team'
+    #ACME  SSL certificate retrival - VM must be public (not behind a proxy), have ports 80 443 open and have caddy web server enabed in install-app.sh
+    #use one of the following instead of 'https://acme-staging-v02.api.letsencrypt.org/directory' to get real SSL certs 'https://acme-v02.api.letsencrypt.org/directory' or 'https://acme.zerossl.com/v2/DV90'
+    ACME: 'https://acme-v02.api.letsencrypt.org/directory'
+    ACME_STAGING: 'https://acme-staging-v02.api.letsencrypt.org/directory'
+  before_script:
+    #install and configure SSH on the gitlab-runner
+    - chmod og= $RSA
+    - apk update && apk add openssh-client sshpass
+    #save CI pipeline variables ready for transfer to the deployment server
+    - echo CI_REGISTRY_USER=${CI_REGISTRY_USER} CI_REGISTRY_PASSWORD=${CI_REGISTRY_PASSWORD} CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE} CI_COMMIT_TAG=${CI_COMMIT_TAG} CI_REGISTRY=${CI_REGISTRY} URL=${URL} EMAIL=${GITLAB_USER_EMAIL} ACME=${ACME_STAGING} > src/main/docker/.env
+    #delete previous ~/team-project/ folder if it is there and run (install-docker.sh) on the deployment server if it is needed
+    - sshpass -Ppassphrase -p $PASSPHRASE ssh -o StrictHostKeyChecking=no -i $RSA $USER@$IP "(rm -rf ~/team-project || true ) && (which docker || sh team-project/install-docker.sh)"
+    #transfer src/main/docker/ to the deployment server
+    - sshpass -Ppassphrase -p $PASSPHRASE scp -o StrictHostKeyChecking=no -i $RSA -r src/main/docker/ $USER@$IP:~/team-project
+    #run (install-app.sh) on the deployment server
+    - sshpass -Ppassphrase -p $PASSPHRASE ssh -o StrictHostKeyChecking=no -i $RSA $USER@$IP "sh team-project/install-app.sh"
+  script:
+    - sshpass -Ppassphrase -p $PASSPHRASE ssh -o StrictHostKeyChecking=no -i $RSA $USER@$IP "docker compose -f ~/team-project/dev.yml up -d && docker system prune --force --filter 'until=24h'"
+
+deploy-prod:
+  image: alpine:latest
+  stage: deploy
+  #when: never means this stage is disabled, change to when: on_success to enable
+  when: never
+  #when: on_success
+  only:
+    - tags
+  except:
+    - branches
+  dependencies:
+    - deploy-dev
+  resource_group: deployment
+  before_script:
+    #install and configure SSH on the gitlab-runner
+    - chmod og= $RSA
+    - apk update && apk add openssh-client sshpass
+  script:
+    - sshpass -Ppassphrase -p $PASSPHRASE ssh -o StrictHostKeyChecking=no -i $RSA $USER@$IP "docker compose -f ~/team-project/prd.yml up -d && docker system prune --force --filter 'until=24h'"
