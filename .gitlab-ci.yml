@@ -5,11 +5,6 @@ cache:
   paths:
     - .maven/
 stages:
-  - check
-  - build
-  - test
-  - analyze
-  - package
   - release
   - deploy
 before_script:
@@ -28,7 +23,7 @@ publish-docker:
     - maven-package
   script:
     - echo "pushing ${CI_REGISTRY_IMAGE} ${CI_REGISTRY_USER} ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY} ${CI_COMMIT_TAG}"
-    - ./mvnw -ntp -e -X jib:build -DskipTests -Pprod -Djib.to.auth.username=${CI_REGISTRY_USER} -Djib.to.auth.password=${CI_REGISTRY_PASSWORD} -Djib.to.image=${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}latest -Dmaven.repo.local=$MAVEN_USER_HOME
+    - ./mvnw -ntp -e -X compile jib:build -DskipTests -Pprod -Djib.to.auth.username=${CI_REGISTRY_USER} -Djib.to.auth.password=${CI_REGISTRY_PASSWORD} -Djib.to.image=${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}latest -Dmaven.repo.local=$MAVEN_USER_HOME
 
 #deploy expects $RSA $USER@$IP are set in the repo - Setting -> CI/CD -> variables
 #$RSA should be a private key file, $USER is the VM user name (e.g. ubuntu, root or ec2) and $IP is the IP address of the Virtual Machine
@@ -36,8 +31,8 @@ publish-docker:
 deploy-dev:
   image: alpine:latest
   stage: deploy
-  #when: never means this stage is disabled, change to when: on_success to enable
-  when: never
+  #when: manual means this stage is disabled, change to when: on_success to enable
+  when: manual
   #when: on_success
   variables:
     URL: '${CI_PROJECT_NAME}.bham.team'
@@ -63,8 +58,8 @@ deploy-dev:
 deploy-prod:
   image: alpine:latest
   stage: deploy
-  #when: never means this stage is disabled, change to when: on_success to enable
-  when: never
+  #when: manual means this stage is disabled, change to when: on_success to enable
+  when: manual
   #when: on_success
   only:
     - tags
