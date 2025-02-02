@@ -12,7 +12,6 @@ TODO:
 
    - Alice S. example@student.bham.ac.uk
    - Bob S. example@student.bham.ac.uk
-   - <!-- this is a comment: delete this (and Alice and Bob), add your name and email  -->
 
 3. Modify [gdpr-policy.component.html](src/main/webapp/app/gdpr-policy/gdpr-policy.component.html) to add your team number (replace X) and team members to the contact section.
 
