@@ -18,7 +18,6 @@ docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}
 
 echo "the app deployment script is configuring the development docker compose script"
 sed -i "4s|teamproject|${CI_REGISTRY_IMAGE}|" ~/team-project/dev.yml
-sed -i "4s|latest|${CI_COMMIT_TAG}|" ~/team-project/dev.yml
 
 echo "the app deployment script is configuring the production docker compose script"
 if [ -n "${CI_COMMIT_TAG}" ]; then
@@ -37,6 +36,7 @@ fi
 
 #uncomment these lines if you will deploy to your own public VM
 echo "the app deployment script is configuring caddy (web server)"]
+sed -i "s|DEVDOMAIN|$DEVURL|g" ~/team-project/Caddyfile
 sed -i "s|DOMAIN|$URL|g" ~/team-project/Caddyfile
 sed -i "s|EMAIL|$EMAIL|g" ~/team-project/Caddyfile
 sed -i "s|ACME|$ACME|g" ~/team-project/Caddyfile

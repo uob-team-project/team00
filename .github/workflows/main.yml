@@ -6,7 +6,7 @@ jobs:
     #runs-on: self-hosted means you need to setup self hosted runners to run this job see https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners
     runs-on: self-hosted
     #if: startsWith(github.ref, 'refs/tags/') means only runs on tagged commits
-    if: startsWith(github.ref, 'refs/tags/')     
+    if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: read
       packages: write
@@ -58,13 +58,16 @@ jobs:
             -Djib.to.auth.username=${{ github.actor }} \
             -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }} \
             -Djib.to.image=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.sha }} \
+            -Djib.to.tags=latest \
             -Dmaven.repo.local=$MAVEN_USER_HOME
 
   deploy-dev:
     name: deploy development app via ssh
     runs-on: self-hosted
     needs: publish-docker
-    #if: false means never runs; if: startsWith(github.ref, 'refs/tags/') means only runs on tagged commits, ensure you have setup secrets before trying to deploy
+    #if: false means never runs;
+    #if: success() means previous stages must pass;
+    #if: startsWith(github.ref, 'refs/tags/') means only runs on tagged commits, ensure you have setup secrets before trying to deploy
     #if: startsWith(github.ref, 'refs/tags/') && success()
     if: false
     concurrency: # Ensures only one deploy job runs at a time
@@ -73,6 +76,7 @@ jobs:
     env:
       RSA_PRIVATE_KEY: ${{secrets.RSA_PRIVATE_KEY}}
       URL: '${{ github.event.repository.name }}.bham.team' # URL as per project name
+      DEVURL: '${{ github.event.repository.name }}.dev.bham.team' # URL as per project name
       ACME: 'https://acme-v02.api.letsencrypt.org/directory'
       ACME_STAGING: 'https://acme-staging-v02.api.letsencrypt.org/directory'
       CI_REGISTRY_USER: ${{ github.actor }} # GitHub username for authentication
@@ -108,6 +112,7 @@ jobs:
                CI_COMMIT_TAG=${{ github.sha }} \
                CI_REGISTRY=${{ env.CI_REGISTRY }} \
                ACME=${{ env.ACME_STAGING }} \
+               DEVURL=${{ env.DEVURL }} \
                URL=${{ env.URL }} \
                EMAIL=${{ github.event.head_commit.author.email }} > src/main/docker/.env
 
@@ -133,7 +138,7 @@ jobs:
       - name: Deploy and clean Docker
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_IP }} "
-            docker compose -f ~/team-project/app.yml up -d
+            docker compose -f ~/team-project/dev.yml up -d
             docker system prune --force --filter 'until=24h'
           "
 
@@ -141,6 +146,7 @@ jobs:
     name: deploy production version via ssh
     runs-on: self-hosted
     needs: deploy-dev
+    #if: "startsWith(github.ref, 'refs/tags/') && success() && contains(github.event.head_commit.message, '[production]') && contains(github.event.pull_request.title, '[production]')"
     #if: startsWith(github.ref, 'refs/tags/') && success()
     #if: success()
     if: false
