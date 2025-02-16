@@ -37,8 +37,8 @@ DEPLOY_IP:80 {
 	header Content-Type text/html
   respond <<HTML
           <html>
-           <h1>Caddy web server is running on DEPLOY_IP </h1> <br/> <br/>
-           <p>After getting DNS entries from <a href=https://forms.office.com/e/C0kaiRMuDD>https://forms.office.com/e/C0kaiRMuDD</a> <br> try:
+           <h1>Caddy web server is running on DEPLOY_IP </h1> <br/>
+           <p>After getting DNS entries from <a href=https://forms.office.com/e/C0kaiRMuDD>https://forms.office.com/e/C0kaiRMuDD</a> <br/> try:
            <a href=http://DEVDOMAIN>http://DEVDOMAIN</a> or<br> <a href=http://DOMAIN>http://DOMAIN</a> </p>
           <html>
           HTML 200
