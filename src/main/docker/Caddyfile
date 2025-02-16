@@ -7,27 +7,25 @@
 }
 DOMAIN {
 	handle_errors {
-		respond "This production version of the app will only become available after a tagged commit has been made on the main branch.
+		respond "This production version of the app will only become available after a tagged commit has been made to the main branch.
 
-		A dev version of the app should be accessible here: http://DEVDOMAIN/
+A development version of the app should be accessible here: http://DEVDOMAIN/
 
-		Error connecting to DOMAIN production app backend on docker host http://teamproject-prd:8080.
+Error connecting to production app backend on docker host http://teamproject-prd:8080.
 
-		After a tagged commit with [production] in the commit message has deployed, wait 30 seconds and refresh this page.
+After a tagged commit has deployed, wait 30 seconds and refresh this page.
 
-		If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/prd.yml up'"
+If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/prd.yml up'"
 	}
 	reverse_proxy http://teamproject-prd:8080
 }
 DEVDOMAIN {
 	handle_errors {
-		respond "Error
+  respond "Error connecting to DEVDOMAIN development app backend on docker host http://teamproject-dev:8080.
 
-		Error connecting to DEVDOMAIN development app backend on docker host http://teamproject-dev:8080.
+After a commit to the main branch has deployed, wait 30 seconds and refresh this page.
 
-	  After a tagged commit has deployed,	wait 30 seconds and refresh this page.
-
-		If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/dev.yml up'"
+If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/dev.yml up'"
 	}
 	reverse_proxy http://teamproject-dev:8080
 }
