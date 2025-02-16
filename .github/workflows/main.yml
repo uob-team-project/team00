@@ -53,12 +53,12 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Cache local Maven repository
+      - name: Cache Maven packages
         uses: actions/cache@v3
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-v1-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-v1-
 
       - name: Cache node modules
         uses: actions/cache@v3
