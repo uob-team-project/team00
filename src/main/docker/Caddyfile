@@ -34,7 +34,14 @@ DEVDOMAIN {
 
 #the following three lines can be removed once the server is confirmed working
 DEPLOY_IP:80 {
-  respond "<h1>Caddy web server is running on DEPLOY_IP </h1> <br/> <br/> <p>after getting DNS entries from <a href=https://forms.office.com/e/C0kaiRMuDD>here</a> try <a href=http://DEVDOMAIN>http://DEVDOMAIN</a> or <a href=http://DOMAIN>http://DOMAIN</a> </p> "
+	header Content-Type text/html
+  respond <<HTML
+          <html>
+           <h1>Caddy web server is running on DEPLOY_IP </h1> <br/> <br/>
+           <p>After getting DNS entries from <a href=https://forms.office.com/e/C0kaiRMuDD>https://forms.office.com/e/C0kaiRMuDD</a> <br> try:
+           <a href=http://DEVDOMAIN>http://DEVDOMAIN</a> or<br> <a href=http://DOMAIN>http://DOMAIN</a> </p>
+          <html>
+          HTML 200
 }
 
 #to serve on a CUSTOMURL e.g. sceleton.bham.team
