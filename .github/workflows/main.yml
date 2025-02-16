@@ -68,8 +68,7 @@ jobs:
     #if: false means never runs;
     #if: success() means previous stages must pass;
     #if: startsWith(github.ref, 'refs/tags/') means only runs on tagged commits, ensure you have setup secrets before trying to deploy
-    #if: startsWith(github.ref, 'refs/tags/') && success()
-    if: false
+    if: startsWith(github.ref, 'refs/tags/') && success()
     concurrency: # Ensures only one deploy job runs at a time
       group: deployment
 
@@ -146,10 +145,10 @@ jobs:
     name: deploy production version via ssh
     runs-on: self-hosted
     needs: deploy-dev
-    #if: "startsWith(github.ref, 'refs/tags/') && success() && contains(github.event.head_commit.message, '[production]') && contains(github.event.pull_request.title, '[production]')"
+    if: "startsWith(github.ref, 'refs/tags/') && success() && contains(github.event.head_commit.message, '[production]') && contains(github.event.pull_request.title, '[production]')"
     #if: startsWith(github.ref, 'refs/tags/') && success()
     #if: success()
-    if: false
+    #if: false
 
     concurrency: # Ensures only one deploy job runs at a time
       group: deployment
