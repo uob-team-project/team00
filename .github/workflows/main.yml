@@ -70,7 +70,7 @@ jobs:
       - name: Build and push Docker image to ghcr
         run: |
           echo "pushing ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.sha }}"
-          ./mvnw -ntp -e -X clean compile jib:build -DskipTests -Pprod \
+          ./mvnw -ntp clean compile jib:build -DskipTests -Pprod \
             -Djib.to.auth.username=${{ github.actor }} \
             -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }} \
             -Djib.to.image=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.sha }} \
