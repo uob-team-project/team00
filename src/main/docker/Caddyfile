@@ -13,7 +13,9 @@ DOMAIN {
 
 		Error connecting to DOMAIN production app backend on docker host http://teamproject-prd:8080.
 
-		After a tagged commit has deployed, wait 30 seconds and refresh this page. If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/prd.yml up'"
+		After a tagged commit with [production] in the commit message has deployed, wait 30 seconds and refresh this page.
+
+		If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/prd.yml up'"
 	}
 	reverse_proxy http://teamproject-prd:8080
 }
@@ -23,14 +25,16 @@ DEVDOMAIN {
 
 		Error connecting to DEVDOMAIN development app backend on docker host http://teamproject-dev:8080.
 
-		After 30 seconds refresh this page. If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/dev.yml up'"
+	  After a tagged commit has deployed,	wait 30 seconds and refresh this page.
+
+		If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/dev.yml up'"
 	}
 	reverse_proxy http://teamproject-dev:8080
 }
 
 #the following three lines can be removed once the server is confirmed working
 DEPLOY_IP:80 {
-  respond "Caddy web server is running on DEPLOY_IP - with DNS entries from https://forms.office.com/e/C0kaiRMuDD try http://DEVDOMAIN or http://DOMAIN"
+  respond "<h1>Caddy web server is running on DEPLOY_IP </h1> <br/> <br/> <p>after getting DNS entries from <a href=https://forms.office.com/e/C0kaiRMuDD>here</a> try <a href=http://DEVDOMAIN>http://DEVDOMAIN</a> or <a href=http://DOMAIN>http://DOMAIN</a> </p>"
 }
 
 #to serve on a CUSTOMURL e.g. sceleton.bham.team
