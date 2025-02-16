@@ -45,6 +45,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: maven-repo-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            maven-repo-
+
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -60,6 +68,8 @@ jobs:
             -Djib.to.image=ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${{ github.sha }} \
             -Djib.to.tags=latest \
             -Dmaven.repo.local=$MAVEN_USER_HOME
+        env:
+          MAVEN_USER_HOME: ~/.m2/repository
 
   deploy-dev:
     name: deploy development app via ssh
@@ -113,6 +123,7 @@ jobs:
                ACME=${{ env.ACME_STAGING }} \
                DEVURL=${{ env.DEVURL }} \
                URL=${{ env.URL }} \
+               DEPLOY_IP=${{ env.DEPLOY_IP }} \
                EMAIL=${{ github.event.head_commit.author.email }} > src/main/docker/.env
 
       # SSH into the VM and ensure Docker is installed, delete previous folder

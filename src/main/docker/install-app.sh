@@ -40,6 +40,7 @@ sed -i "s|DEVDOMAIN|$DEVURL|g" ~/team-project/Caddyfile
 sed -i "s|DOMAIN|$URL|g" ~/team-project/Caddyfile
 sed -i "s|EMAIL|$EMAIL|g" ~/team-project/Caddyfile
 sed -i "s|ACME|$ACME|g" ~/team-project/Caddyfile
+sed -i "s|DEPLOY_IP|$DEPLOY_IP|g" ~/team-project/Caddyfile
 sudo mkdir -p ~/caddy/ || true
 sudo chown -R $USER:$USER ~/caddy/ || true
 cp ~/team-project/Caddyfile ~/caddy/Caddyfile

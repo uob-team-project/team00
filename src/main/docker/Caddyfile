@@ -1,7 +1,7 @@
 {
 	#email address for letsencrypt
 	email EMAIL
-	# to retrieve real certificates use https://acme-v02.api.letsencrypt.org/directory or https://acme.zerossl.com/v2/DV90
+	# to retrieve real certificates use https://acme-v02.api.letsencrypt.org/directory or https://acme.zerossl.com/v2/DV90 instead of ACME in the git repo file src/main/docker/Caddyfile
 	# requires the VM to be accessible directly from the public internet via port 80 and 443
 	acme_ca ACME
 }
@@ -28,7 +28,20 @@ DEVDOMAIN {
 	reverse_proxy http://teamproject-dev:8080
 }
 
-#edit the below to serve on a custom domain
-#example.com {
-#    reverse_proxy http://teamproject-prod:8080
-#}
+DEPLOY_IP {
+  tls internal
+	handle_errors {
+		respond "Error
+
+		Error connecting to DEVDOMAIN development app backend on docker host http://teamproject-dev:8080.
+
+		After 30 seconds refresh this page. If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/dev.yml up'"
+	}
+	reverse_proxy http://teamproject-dev:8080
+}
+
+#to serve on a CUSTOMDOMAIN e.g. sceleton.bham.team
+# 1) request a DNS entry for sceleton.bham.team pointing at the Virtual Machine IP address (DEPLOY_IP) https://forms.office.com/e/C0kaiRMuDD
+# 2) uncomment/replace '#CUSTOMDOMAIN' with 'sceleton.bham.team' in the git repo file src/main/docker/Caddyfile
+# 3) make a tagged commit
+#CUSTOMDOMAIN { reverse_proxy http://teamproject-prod:8080 }
