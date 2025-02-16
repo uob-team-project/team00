@@ -28,20 +28,13 @@ DEVDOMAIN {
 	reverse_proxy http://teamproject-dev:8080
 }
 
-DEPLOY_IP {
-  tls internal
-	handle_errors {
-		respond "Error
-
-		Error connecting to DEVDOMAIN development app backend on docker host http://teamproject-dev:8080.
-
-		After 30 seconds refresh this page. If still not live, login to the VM via SSH and try to debug using 'docker compose -f ~/team-project/dev.yml up'"
-	}
-	reverse_proxy http://teamproject-dev:8080
+#the following three lines can be removed once the server is confirmed working
+DEPLOY_IP:80 {
+  respond "Caddy web server is running on DEPLOY_IP - with DNS entries from https://forms.office.com/e/C0kaiRMuDD try http://DEVDOMAIN or http://DOMAIN"
 }
 
-#to serve on a CUSTOMDOMAIN e.g. sceleton.bham.team
+#to serve on a CUSTOMURL e.g. sceleton.bham.team
 # 1) request a DNS entry for sceleton.bham.team pointing at the Virtual Machine IP address (DEPLOY_IP) https://forms.office.com/e/C0kaiRMuDD
-# 2) uncomment/replace '#CUSTOMDOMAIN' with 'sceleton.bham.team' in the git repo file src/main/docker/Caddyfile
+# 2) uncomment/replace '#CUSTOMURL' with 'sceleton.bham.team' in the git repo file src/main/docker/Caddyfile
 # 3) make a tagged commit
-#CUSTOMDOMAIN { reverse_proxy http://teamproject-prod:8080 }
+#CUSTOMURL { reverse_proxy http://teamproject-prod:8080 }
