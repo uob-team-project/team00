@@ -184,7 +184,7 @@ jobs:
           eval $(ssh-agent -s)  # Start SSH agent
           ssh-add ~/.ssh/id_rsa  # Add the private key to the agent
 
-      # Add known hosts to prevent SSH from asking to verify the host
+      # Add known hosts to prevent  from asking to verify the host
       - name: Add SSH known hosts
         run: |
           ssh-keyscan -H ${{ secrets.DEPLOY_IP }} >> ~/.ssh/known_hosts
