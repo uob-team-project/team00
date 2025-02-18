@@ -42,8 +42,10 @@ DEPLOY_IP:80 {
           HTML 200
 }
 
-#to serve on a CUSTOMURL e.g. sceleton.bham.team
-# 1) request a DNS entry for sceleton.bham.team pointing at the Virtual Machine IP address (DEPLOY_IP) https://forms.office.com/e/C0kaiRMuDD
-# 2) uncomment/replace '#CUSTOMURL' with 'sceleton.bham.team' in the git repo file src/main/docker/Caddyfile
+#to serve on a CUSTOMURL e.g. sceletons.bham.team
+# 1) request a DNS entry for sceletons.bham.team pointing at the Virtual Machine IP address (DEPLOY_IP) https://forms.office.com/e/C0kaiRMuDD
+# 2) replace '#CUSTOMURL' with 'sceletons.bham.team', uncomment the last 3 lines of the file (lines 49-51) in the git repo file src/main/docker/Caddyfile
 # 3) make a tagged commit
-#CUSTOMURL { reverse_proxy http://teamproject-prd:8080 }
+#CUSTOMURL { 
+#  reverse_proxy http://teamproject-prd:8080 
+#}
